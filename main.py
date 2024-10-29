@@ -1,5 +1,6 @@
 import pygame
 import sys
+import random
 
 # 初始化 Pygame
 pygame.init()
@@ -83,6 +84,12 @@ FPS = 60
 # 定义字体
 font = pygame.font.SysFont(None, 36)
 
+# get a tanmu
+def get_tanmu(tanmu_list):
+    return random.choice(tanmu_list)
+
+positive_tanmu = get_tanmu(youqing_tanmu)
+
 # 定义长方形的位置和尺寸
 rect_x = 50  # 距离左边 50 像素
 rect_y = 100  # 距离顶部初始位置 100 像素
@@ -90,6 +97,9 @@ rect_width = 200  # 长方形宽度
 rect_height = 50  # 长方形高度
 border_width = 1  # 描边宽度
 rect_speed = 5  # 长方形移动速度
+
+# 定义字体
+font = pygame.font.SysFont("SimHei", 36)
 
 # 主循环
 running = True
@@ -118,7 +128,8 @@ while running:
     pygame.draw.rect(screen, RED, (rect_x, rect_y, rect_width, rect_height), border_width)
 
     # 在长方形中绘制文字
-    text = font.render("Hello World!", True, BLACK)
+    
+    text = font.render(positive_tanmu, True, BLACK)
     text_rect = text.get_rect(center=(rect_x + rect_width // 2, rect_y + rect_height // 2))
     screen.blit(text, text_rect)
 
