@@ -7,7 +7,7 @@ import random
 pygame.init()
 
 # 设置窗口大小
-SCREEN_WIDTH = 800
+SCREEN_WIDTH = 1100
 SCREEN_HEIGHT = 600
 screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 
@@ -82,14 +82,14 @@ youqing_tanmu = [
 clock = pygame.time.Clock()
 FPS = 60
 
-
 gj_tanmu_timer = 0
 gj_tanmu_interval = 120  # 每隔120帧（约2秒）生成一个新的弹幕
 current_gj_tanmu = ""  # 当前弹幕
 gj_tanmu_list = []  # 弹幕列表
 gj_tanmu_speed = 1  # 弹幕移动速度
-available_y_positions = [50, 100, 150, 200, 250, 300, 350, 400, 450, 500]
-min_distance = 100  # 弹幕之间的最小距离
+spacing = 25  # 每个弹幕之间的垂直间隔
+available_y_positions = [y for y in range(spacing, SCREEN_HEIGHT, spacing)]
+last_gj_y = 0  # 弹幕之间的最小距离
 
 # get a tanmu
 def get_tanmu(tanmu_list):
@@ -104,8 +104,6 @@ rect_width = 200  # 长方形宽度
 rect_height = 50  # 长方形高度
 border_width = 1  # 描边宽度
 rect_speed = 5  # 长方形移动速度
-
-
 
 # 定义字体
 font = pygame.font.Font("NotoSansSC-VariableFont_wght.ttf", 20)
@@ -135,7 +133,7 @@ while running:
         # 确保弹幕位置之间保持足够的间隔
         possible_y_positions = [
             y for y in available_y_positions 
-            if all(abs(y - tanmu["y"]) >= min_distance for tanmu in gj_tanmu_list)
+            if abs(y - last_gj_y) > 50
         ]
         
         # 只有在存在合适的Y坐标时生成新弹幕
@@ -143,7 +141,8 @@ while running:
             new_y = random.choice(possible_y_positions)
             new_tanmu = {"text": random.choice(gangjing_tanmu), "x": SCREEN_WIDTH, "y": new_y}
             gj_tanmu_list.append(new_tanmu)
-        
+            last_gj_y = new_y
+
         gj_tanmu_timer = 0  # 重置计时器
 
     # 更新弹幕位置
