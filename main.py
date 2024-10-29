@@ -1,6 +1,7 @@
 import pygame
 import sys
 import random
+import copy
 
 # 初始化 Pygame
 pygame.init()
@@ -83,13 +84,13 @@ clock = pygame.time.Clock()
 FPS = 60
 
 # Bomb button
-button_bomb_position = (200, 550)
+button_bomb_position = (200, 530)
 try:
     bomb_image = pygame.image.load("bomb.webp")
 except pygame.error:
     print("Cannot find bomb.webp")
     sys.exit()
-bomb_image = pygame.transform.scale(bomb_image, (50, 50))
+bomb_image = pygame.transform.scale(bomb_image, (70, 70))
 button_bomb_rect = bomb_image.get_rect(center = button_bomb_position)
 
 # get a tanmu
@@ -113,12 +114,13 @@ font = pygame.font.SysFont("SimHei", 20)
 creating_bomb = False
 def creating_bomb_draw():
     creating_bomb_pos = pygame.mouse.get_pos()
-    screen.blit(bomb_image, (creating_bomb_pos[0] - 15, creating_bomb_pos[1] - 25))
+    screen.blit(bomb_image, creating_bomb_pos)
 
 #Bomb instances
 setted_bombs = []
-# def create_a_bomb():
-    
+def create_a_bomb():
+    new_bomb = {"position": pygame.mouse.get_pos(), "scale": 70, "img": bomb_image}
+    setted_bombs.append(new_bomb)
 
 
 # 主循环
@@ -129,14 +131,16 @@ while running:
         if event.type == pygame.QUIT:  # 点击关闭按钮退出
             running = False
         elif event.type == pygame.MOUSEBUTTONDOWN:
-            if button_bomb_rect.collidepoint(event.pos): #Want to set a bomb
+            if button_bomb_rect.collidepoint(event.pos): #Want to set a bomb by clicking
                 if not creating_bomb:
                     creating_bomb = True
                 else:
                     creating_bomb = False
-            # elif creating_bomb: #Set a bomb
+            elif creating_bomb: #Set a bomb
+                create_a_bomb()
+                creating_bomb = False
         elif event.type == pygame.KEYDOWN:
-            if event.key == pygame.K_e:
+            if event.key == pygame.K_e: #Want to set a bomb by pressing E
                 if not creating_bomb:
                     creating_bomb = True
                 else:
@@ -160,12 +164,16 @@ while running:
     # 绘制炸弹按钮
     screen.blit(bomb_image, button_bomb_rect)
     font_bomb = pygame.font.SysFont("SimHei", 18)
-    text = font_bomb.render("拉黑", True, BLACK)
-    screen.blit(text, (button_bomb_rect.x, button_bomb_rect.y + 50))
+    text = font_bomb.render("那咋了？[E]", True, BLACK)
+    screen.blit(text, (button_bomb_rect.x - 20, button_bomb_rect.y + 70))
 
-    #Draw preview of dropping a bomb
+    #Draw a preview of dropping a bomb
     if creating_bomb:
         creating_bomb_draw()
+
+    #Draw the setted bumb
+    for bomb in setted_bombs:
+        screen.blit(bomb["img"], bomb["position"])
 
     # 在这里添加你的绘制代码
     # 绘制带红色描边的长方形
