@@ -15,10 +15,16 @@ pygame.display.set_caption("Pygame Template")
 # 定义颜色
 WHITE = (255, 255, 255)
 BLACK = (0, 0, 0)
+RED = (255, 0, 0)
 
 # 设置帧率
 clock = pygame.time.Clock()
 FPS = 60
+
+# 按钮属性
+button_bomb_position = (200, 500)
+button_bomb_radius = 30
+button_bomb_color = RED
 
 # 主循环
 running = True
@@ -33,6 +39,11 @@ while running:
 
     # 绘制图像
     screen.fill(WHITE)  # 背景填充为白色
+
+    pygame.draw.circle(screen, button_bomb_color, button_bomb_position, button_bomb_radius)
+    font = pygame.font.Font(None, 36)
+    text = font.render("Bomb", True, BLACK)
+    screen.blit(text, (button_bomb_position[0] - 20, button_bomb_position[1] + 30))
 
     # 在这里添加你的绘制代码
 
