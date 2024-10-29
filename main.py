@@ -110,6 +110,8 @@ button_text = "发射弹幕"  # 按钮的文本
 
 # 标志发射状态
 shot_tanmu = False
+shot_tanmu_timer = 0
+shot_tanmu_interval = 60  # 每隔60帧（约1秒）发射一个弹幕
 
 positive_tanmu = random.choice(youqing_tanmu)  # 随机选择友情弹幕
 
@@ -123,10 +125,19 @@ while running:
             running = False
         elif event.type == pygame.MOUSEBUTTONDOWN:
             mouse_x, mouse_y = event.pos
-            if button_x <= mouse_x <= button_x + button_width and button_y <= mouse_y <= button_y + button_height:
+            if button_x <= mouse_x <= button_x + button_width \
+                and button_y <= mouse_y <= button_y + button_height \
+                    and shot_tanmu_timer >= shot_tanmu_interval:
                 # 点击按钮时发射弹幕
+                shot_tanmu_timer = 0
+                shot_tanmu = True
+        elif event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_SPACE and shot_tanmu_timer >= shot_tanmu_interval:
+                # 按下空格键时发射弹幕
+                shot_tanmu_timer = 0
                 shot_tanmu = True
 
+    shot_tanmu_timer += 1
     # 获取按键
     keys = pygame.key.get_pressed()
     
@@ -161,6 +172,28 @@ while running:
     # 更新友情弹幕位置
     for tanmu in pos_tanmu_list:
         tanmu["x"] += pos_tanmu_speed  # 向右移动
+
+    # 碰撞检测
+    for pos_tanmu in pos_tanmu_list[:]:  # 遍历友情弹幕
+        pos_rect = pygame.Rect(pos_tanmu["x"], pos_tanmu["y"], font.size(pos_tanmu["text"])[0], font.get_height())
+        for gj_tanmu in gj_tanmu_list[:]:  # 遍历杠精弹幕
+            gj_rect = pygame.Rect(gj_tanmu["x"], gj_tanmu["y"], font.size(gj_tanmu["text"])[0], font.get_height())
+            
+            # 如果发生碰撞
+            if pos_rect.colliderect(gj_rect):
+                # 删除友情弹幕的最后一个字符
+                if len(pos_tanmu["text"]) > 1:
+                    pos_tanmu["text"] = pos_tanmu["text"][:-1]
+                else:
+                    pos_tanmu_list.remove(pos_tanmu)  # 删除空的弹幕
+                    break
+
+                # 删除杠精弹幕的第一个字符
+                if len(gj_tanmu["text"]) > 1:
+                    gj_tanmu["text"] = gj_tanmu["text"][1:]
+                else:
+                    gj_tanmu_list.remove(gj_tanmu)  # 删除空的弹幕
+                    break
 
     # 绘制图像
     screen.fill(WHITE)  # 背景填充为白色
