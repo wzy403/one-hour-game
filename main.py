@@ -1,3 +1,4 @@
+import random
 import pygame
 import sys
 
@@ -79,6 +80,10 @@ youqing_tanmu = [
 clock = pygame.time.Clock()
 FPS = 60
 
+gj_tanmu_timer = 0
+gj_tanmu_interval = 120  # 每隔120帧（约2秒）生成一个新的弹幕
+current_gj_tanmu = ""  # 当前弹幕
+
 # 主循环
 running = True
 while running:
@@ -89,6 +94,12 @@ while running:
 
     # 更新游戏逻辑
     # 在这里添加你的游戏逻辑更新
+    tanmu_timer += 1
+    if tanmu_timer >= tanmu_interval:
+        # 随机选择一个杠精弹幕
+        current_tanmu = random.choice(gangjing_tanmu)
+        tanmu_timer = 0
+
 
     # 绘制图像
     screen.fill(WHITE)  # 背景填充为白色
