@@ -116,8 +116,7 @@ while running:
                 # 按下空格键时发射弹幕
                 shot_tanmu_timer = 0
                 shot_tanmu = True
-        elif event.type == pygame.KEYDOWN:
-            if event.key == pygame.K_e: #Want to set a bomb by pressing E
+            elif event.key == pygame.K_e: #Want to set a bomb by pressing E
                 if not creating_bomb:
                     creating_bomb = True
                 else:
