@@ -150,16 +150,16 @@ while running:
             elif creating_bomb: #Set a bomb
                 create_a_bomb()
                 creating_bomb = False
+            mouse_x, mouse_y = event.pos
+            if button_x <= mouse_x <= button_x + button_width and button_y <= mouse_y <= button_y + button_height:
+                # 点击按钮时发射弹幕
+                shot_tanmu = True
         elif event.type == pygame.KEYDOWN:
             if event.key == pygame.K_e: #Want to set a bomb by pressing E
                 if not creating_bomb:
                     creating_bomb = True
                 else:
                     creating_bomb = False
-            mouse_x, mouse_y = event.pos
-            if button_x <= mouse_x <= button_x + button_width and button_y <= mouse_y <= button_y + button_height:
-                # 点击按钮时发射弹幕
-                shot_tanmu = True
 
     # 获取按键
     keys = pygame.key.get_pressed()
