@@ -1,6 +1,7 @@
 import random
 import pygame
 import sys
+import random
 
 # 初始化 Pygame
 pygame.init()
@@ -11,10 +12,11 @@ SCREEN_HEIGHT = 600
 screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 
 # 设置窗口标题
-pygame.display.set_caption("Pygame Template")
+pygame.display.set_caption("Pygame Template with Moving Rectangle and Text")
 
 # 定义颜色
 WHITE = (255, 255, 255)
+RED = (255, 0, 0)
 BLACK = (0, 0, 0)
 
 # 杠精弹幕
@@ -80,9 +82,31 @@ youqing_tanmu = [
 clock = pygame.time.Clock()
 FPS = 60
 
+<<<<<<< HEAD
 gj_tanmu_timer = 0
 gj_tanmu_interval = 120  # 每隔120帧（约2秒）生成一个新的弹幕
 current_gj_tanmu = ""  # 当前弹幕
+=======
+# 定义字体
+font = pygame.font.SysFont(None, 36)
+
+# get a tanmu
+def get_tanmu(tanmu_list):
+    return random.choice(tanmu_list)
+
+positive_tanmu = get_tanmu(youqing_tanmu)
+
+# 定义长方形的位置和尺寸
+rect_x = 50  # 距离左边 50 像素
+rect_y = 100  # 距离顶部初始位置 100 像素
+rect_width = 200  # 长方形宽度
+rect_height = 50  # 长方形高度
+border_width = 1  # 描边宽度
+rect_speed = 5  # 长方形移动速度
+
+# 定义字体
+font = pygame.font.SysFont("SimHei", 36)
+>>>>>>> 2444f60c67465cd664d0db830f6a96a1fd507762
 
 # 主循环
 running = True
@@ -91,6 +115,15 @@ while running:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:  # 点击关闭按钮退出
             running = False
+
+    # 获取按键
+    keys = pygame.key.get_pressed()
+    
+    # 根据上下键调整长方形的 y 坐标
+    if keys[pygame.K_UP]:
+        rect_y -= rect_speed
+    if keys[pygame.K_DOWN]:
+        rect_y += rect_speed
 
     # 更新游戏逻辑
     # 在这里添加你的游戏逻辑更新
@@ -104,7 +137,14 @@ while running:
     # 绘制图像
     screen.fill(WHITE)  # 背景填充为白色
 
-    # 在这里添加你的绘制代码
+    # 绘制带红色描边的长方形
+    pygame.draw.rect(screen, RED, (rect_x, rect_y, rect_width, rect_height), border_width)
+
+    # 在长方形中绘制文字
+    
+    text = font.render(positive_tanmu, True, BLACK)
+    text_rect = text.get_rect(center=(rect_x + rect_width // 2, rect_y + rect_height // 2))
+    screen.blit(text, text_rect)
 
     # 刷新屏幕
     pygame.display.flip()
