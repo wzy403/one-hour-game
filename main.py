@@ -62,10 +62,12 @@ button_text = "发射弹幕"  # 按钮的文本
 
 # 标志发射状态
 shot_tanmu = False
-shot_tanmu_timer = 0
-shot_tanmu_interval = 60  # 每隔60帧（约1秒）发射一个弹幕
+can_shot_tanmu = False
 
-positive_tanmu = random.choice(youqing_tanmu)  # 随机选择友情弹幕
+positive_tanmu_full = random.choice(youqing_tanmu)  # 随机选择友情弹幕
+current_positive_tanmu_text = ""
+letter_timer = 0
+letter_interval = 5
 
 # 主循环
 running = True
@@ -79,17 +81,25 @@ while running:
             mouse_x, mouse_y = event.pos
             if button_x <= mouse_x <= button_x + button_width \
                 and button_y <= mouse_y <= button_y + button_height \
-                    and shot_tanmu_timer >= shot_tanmu_interval:
+                    and can_shot_tanmu:
                 # 点击按钮时发射弹幕
-                shot_tanmu_timer = 0
+                can_shot_tanmu = False
                 shot_tanmu = True
         elif event.type == pygame.KEYDOWN:
-            if event.key == pygame.K_SPACE and shot_tanmu_timer >= shot_tanmu_interval:
+            if event.key == pygame.K_SPACE and can_shot_tanmu:
                 # 按下空格键时发射弹幕
-                shot_tanmu_timer = 0
+                can_shot_tanmu = False
                 shot_tanmu = True
 
-    shot_tanmu_timer += 1
+    if not can_shot_tanmu:
+        letter_timer += 1
+        if letter_timer >= letter_interval:
+            if len(current_positive_tanmu_text) < len(positive_tanmu_full):
+                current_positive_tanmu_text += positive_tanmu_full[len(current_positive_tanmu_text)]
+            else:
+                can_shot_tanmu = True
+            letter_timer = 0
+
     # 获取按键
     keys = pygame.key.get_pressed()
     
@@ -157,16 +167,18 @@ while running:
     screen.blit(button_surface, button_rect)
 
     # 绘制友情弹幕（显示在矩形内）
-    text_surface = font.render(positive_tanmu, True, RED)
+    color_here = RED if can_shot_tanmu else BLUE
+    text_surface = font.render(current_positive_tanmu_text, True, color_here)
     screen.blit(text_surface, (rect_x, rect_y))  # 在当前rect位置显示
 
     # 发射后的弹幕逻辑
     if shot_tanmu:
         # 发射弹幕
-        pos_tanmu = {"text": positive_tanmu, "x": rect_x, "y": rect_y}
+        pos_tanmu = {"text": current_positive_tanmu_text, "x": rect_x, "y": rect_y}
         pos_tanmu_list.append(pos_tanmu)
-        positive_tanmu = random.choice(youqing_tanmu)  # 随机选择友情弹幕
+        positive_tanmu_full = random.choice(youqing_tanmu)  # 随机选择友情弹幕
         shot_tanmu = False
+        current_positive_tanmu_text = ""
         
         # rect_x += pos_tanmu_speed  # 发射弹幕向右移动
         # if rect_x > SCREEN_WIDTH:  # 如果弹幕移出了屏幕，重置弹幕状态
