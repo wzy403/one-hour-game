@@ -82,13 +82,12 @@ youqing_tanmu = [
 clock = pygame.time.Clock()
 FPS = 60
 
-<<<<<<< HEAD
+
 gj_tanmu_timer = 0
 gj_tanmu_interval = 120  # 每隔120帧（约2秒）生成一个新的弹幕
 current_gj_tanmu = ""  # 当前弹幕
-=======
-# 定义字体
-font = pygame.font.SysFont(None, 36)
+gj_tanmu_list = []  # 弹幕列表
+gj_tanmu_speed = 1  # 弹幕移动速度
 
 # get a tanmu
 def get_tanmu(tanmu_list):
@@ -106,7 +105,6 @@ rect_speed = 5  # 长方形移动速度
 
 # 定义字体
 font = pygame.font.SysFont("SimHei", 36)
->>>>>>> 2444f60c67465cd664d0db830f6a96a1fd507762
 
 # 主循环
 running = True
@@ -127,11 +125,16 @@ while running:
 
     # 更新游戏逻辑
     # 在这里添加你的游戏逻辑更新
-    tanmu_timer += 1
-    if tanmu_timer >= tanmu_interval:
-        # 随机选择一个杠精弹幕
-        current_tanmu = random.choice(gangjing_tanmu)
-        tanmu_timer = 0
+    gj_tanmu_timer += 1
+    if gj_tanmu_timer >= gj_tanmu_interval:
+        # 生成新的弹幕，放在屏幕右侧随机的Y位置
+        new_tanmu = {"text": random.choice(gangjing_tanmu), "x": SCREEN_WIDTH, "y": random.randint(0, SCREEN_HEIGHT - 30)}
+        gj_tanmu_list.append(new_tanmu)
+        gj_tanmu_timer = 0  # 重置计时器
+
+    # 更新弹幕位置
+    for tanmu in gj_tanmu_list:
+        tanmu["x"] -= gj_tanmu_speed  # 向左移动
 
 
     # 绘制图像
@@ -145,6 +148,11 @@ while running:
     text = font.render(positive_tanmu, True, BLACK)
     text_rect = text.get_rect(center=(rect_x + rect_width // 2, rect_y + rect_height // 2))
     screen.blit(text, text_rect)
+
+    for tanmu in gj_tanmu_list:
+        text_surface = font.render(tanmu["text"], True, BLACK)
+        screen.blit(text_surface, (tanmu["x"], tanmu["y"]))
+
 
     # 刷新屏幕
     pygame.display.flip()
