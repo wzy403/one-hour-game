@@ -88,6 +88,8 @@ gj_tanmu_interval = 120  # 每隔120帧（约2秒）生成一个新的弹幕
 current_gj_tanmu = ""  # 当前弹幕
 gj_tanmu_list = []  # 弹幕列表
 gj_tanmu_speed = 1  # 弹幕移动速度
+available_y_positions = [50, 100, 150, 200, 250, 300, 350, 400, 450, 500]
+min_distance = 100  # 弹幕之间的最小距离
 
 # get a tanmu
 def get_tanmu(tanmu_list):
@@ -103,12 +105,15 @@ rect_height = 50  # 长方形高度
 border_width = 1  # 描边宽度
 rect_speed = 5  # 长方形移动速度
 
+
+
 # 定义字体
-font = pygame.font.SysFont("SimHei", 36)
+font = pygame.font.Font("NotoSansSC-VariableFont_wght.ttf", 20)
 
 # 主循环
 running = True
 while running:
+
     # 处理事件
     for event in pygame.event.get():
         if event.type == pygame.QUIT:  # 点击关闭按钮退出
@@ -127,9 +132,18 @@ while running:
     # 在这里添加你的游戏逻辑更新
     gj_tanmu_timer += 1
     if gj_tanmu_timer >= gj_tanmu_interval:
-        # 生成新的弹幕，放在屏幕右侧随机的Y位置
-        new_tanmu = {"text": random.choice(gangjing_tanmu), "x": SCREEN_WIDTH, "y": random.randint(0, SCREEN_HEIGHT - 30)}
-        gj_tanmu_list.append(new_tanmu)
+        # 确保弹幕位置之间保持足够的间隔
+        possible_y_positions = [
+            y for y in available_y_positions 
+            if all(abs(y - tanmu["y"]) >= min_distance for tanmu in gj_tanmu_list)
+        ]
+        
+        # 只有在存在合适的Y坐标时生成新弹幕
+        if possible_y_positions:
+            new_y = random.choice(possible_y_positions)
+            new_tanmu = {"text": random.choice(gangjing_tanmu), "x": SCREEN_WIDTH, "y": new_y}
+            gj_tanmu_list.append(new_tanmu)
+        
         gj_tanmu_timer = 0  # 重置计时器
 
     # 更新弹幕位置
