@@ -33,6 +33,15 @@ youqing_tanmu = tanmu_msg["youqing_tanmu"]
 clock = pygame.time.Clock()
 FPS = 60
 
+# Bomb button
+button_bomb_position = (200, 530)
+try:
+    bomb_image = pygame.image.load("bomb.webp")
+except pygame.error:
+    print("Cannot find bomb.webp")
+    sys.exit()
+bomb_image = pygame.transform.scale(bomb_image, (70, 70))
+button_bomb_rect = bomb_image.get_rect(center = button_bomb_position)
 gj_tanmu_timer = 0
 gj_tanmu_interval = 120  # 每隔120帧（约2秒）生成一个新的弹幕
 
@@ -50,7 +59,20 @@ rect_speed = 5  # 移动速度
 pos_tanmu_list = []  # 发射的弹幕列表
 pos_tanmu_speed = 1  # 发射后弹幕的速度
 
-# 定义字体
+# 生成炸弹
+creating_bomb = False
+def creating_bomb_draw():
+    creating_bomb_pos = pygame.mouse.get_pos()
+    bomb_rect = bomb_image.get_rect(center = creating_bomb_pos)
+    screen.blit(bomb_image, bomb_rect)
+
+#Bomb instances
+setted_bombs = []
+def create_a_bomb():
+    new_bomb = {"position": pygame.mouse.get_pos(), "scale": 70, "img": bomb_image}
+    setted_bombs.append(new_bomb)
+bomb_scale_increasing_speed = 1
+
 font = pygame.font.Font("NotoSansSC-VariableFont_wght.ttf", 20)
 
 # 定义按钮的位置和尺寸
@@ -78,6 +100,14 @@ while running:
         if event.type == pygame.QUIT:  # 点击关闭按钮退出
             running = False
         elif event.type == pygame.MOUSEBUTTONDOWN:
+            if button_bomb_rect.collidepoint(event.pos): #Want to set a bomb by clicking
+                if not creating_bomb:
+                    creating_bomb = True
+                else:
+                    creating_bomb = False
+            elif creating_bomb: #Set a bomb
+                create_a_bomb()
+                creating_bomb = False
             mouse_x, mouse_y = event.pos
             if button_x <= mouse_x <= button_x + button_width \
                 and button_y <= mouse_y <= button_y + button_height \
@@ -90,6 +120,11 @@ while running:
                 # 按下空格键时发射弹幕
                 can_shot_tanmu = False
                 shot_tanmu = True
+            elif event.key == pygame.K_e: #Want to set a bomb by pressing E
+                if not creating_bomb:
+                    creating_bomb = True
+                else:
+                    creating_bomb = False
 
     if not can_shot_tanmu:
         letter_timer += 1
@@ -159,6 +194,27 @@ while running:
 
     # 绘制图像
     screen.fill(WHITE)  # 背景填充为白色
+
+    # 绘制炸弹按钮
+    screen.blit(bomb_image, button_bomb_rect)
+    font_bomb = pygame.font.SysFont("SimHei", 18)
+    text = font_bomb.render("那咋了？[E]", True, BLACK)
+    screen.blit(text, (button_bomb_rect.x - 20, button_bomb_rect.y + 70))
+
+    #Draw a preview of dropping a bomb
+    if creating_bomb:
+        creating_bomb_draw()
+
+    #Draw the setted bumb
+    for bomb in setted_bombs:
+        bomb_rect = bomb["img"].get_rect(center = bomb["position"])
+        screen.blit(bomb["img"], bomb_rect)
+        bomb["scale"] += bomb_scale_increasing_speed
+
+        bomb["img"] = pygame.transform.scale(bomb_image, (bomb["scale"], bomb["scale"]))
+        if bomb["scale"] == 120:
+            setted_bombs.remove(bomb)
+
 
     # 绘制按钮
     pygame.draw.rect(screen, BLUE, (button_x, button_y, button_width, button_height))
