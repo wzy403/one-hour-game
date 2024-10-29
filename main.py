@@ -134,8 +134,7 @@ while running:
                     creating_bomb = True
                 else:
                     creating_bomb = False
-            elif creating_bomb: #Set a bomb
-
+            # elif creating_bomb: #Set a bomb
         elif event.type == pygame.KEYDOWN:
             if event.key == pygame.K_e:
                 if not creating_bomb:
