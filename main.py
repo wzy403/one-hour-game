@@ -63,13 +63,15 @@ pos_tanmu_speed = 1  # 发射后弹幕的速度
 creating_bomb = False
 def creating_bomb_draw():
     creating_bomb_pos = pygame.mouse.get_pos()
-    screen.blit(bomb_image, creating_bomb_pos)
+    bomb_rect = bomb_image.get_rect(center = creating_bomb_pos)
+    screen.blit(bomb_image, bomb_rect)
 
 #Bomb instances
 setted_bombs = []
 def create_a_bomb():
     new_bomb = {"position": pygame.mouse.get_pos(), "scale": 70, "img": bomb_image}
     setted_bombs.append(new_bomb)
+bomb_scale_increasing_speed = 1
 
 font = pygame.font.Font("NotoSansSC-VariableFont_wght.ttf", 20)
 
@@ -195,7 +197,14 @@ while running:
 
     #Draw the setted bumb
     for bomb in setted_bombs:
-        screen.blit(bomb["img"], bomb["position"])
+        bomb_rect = bomb["img"].get_rect(center = bomb["position"])
+        screen.blit(bomb["img"], bomb_rect)
+        bomb["scale"] += bomb_scale_increasing_speed
+
+        bomb["img"] = pygame.transform.scale(bomb_image, (bomb["scale"], bomb["scale"]))
+        if bomb["scale"] == 120:
+            setted_bombs.remove(bomb)
+
 
     # 绘制按钮
     pygame.draw.rect(screen, BLUE, (button_x, button_y, button_width, button_height))
