@@ -18,6 +18,7 @@ pygame.display.set_caption("Pygame Template with Moving Rectangle and Text")
 WHITE = (255, 255, 255)
 RED = (255, 0, 0)
 BLACK = (0, 0, 0)
+BLUE = (0, 0, 255)
 
 # 杠精弹幕
 gangjing_tanmu = [
@@ -108,6 +109,15 @@ rect_speed = 5  # 长方形移动速度
 # 定义字体
 font = pygame.font.Font("NotoSansSC-VariableFont_wght.ttf", 20)
 
+# 定义按钮的位置和尺寸
+button_x = SCREEN_WIDTH - 150
+button_y = SCREEN_HEIGHT - 50
+button_width = 100
+button_height = 40
+
+# 定义按钮的文本
+button_text = "发射弹幕"
+
 # 主循环
 running = True
 while running:
@@ -116,6 +126,11 @@ while running:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:  # 点击关闭按钮退出
             running = False
+        elif event.type == pygame.MOUSEBUTTONDOWN:
+            mouse_x, mouse_y = event.pos
+            if button_x <= mouse_x <= button_x + button_width and button_y <= mouse_y <= button_y + button_height:
+                # 发射弹幕
+                positive_tanmu = random.choice(youqing_tanmu)
 
     # 获取按键
     keys = pygame.key.get_pressed()
@@ -153,12 +168,14 @@ while running:
     # 绘制图像
     screen.fill(WHITE)  # 背景填充为白色
 
-    # 绘制带红色描边的长方形
-    pygame.draw.rect(screen, RED, (rect_x, rect_y, rect_width, rect_height), border_width)
+    # 绘制按钮
+    pygame.draw.rect(screen, BLUE, (button_x, button_y, button_width, button_height))
+    button_surface = font.render(button_text, True, WHITE)
+    button_rect = button_surface.get_rect(center=(button_x + button_width // 2, button_y + button_height // 2))
+    screen.blit(button_surface, button_rect)
 
     # 在长方形中绘制文字
-    
-    text = font.render(positive_tanmu, True, BLACK)
+    text = font.render(positive_tanmu, True, RED)
     text_rect = text.get_rect(center=(rect_x + rect_width // 2, rect_y + rect_height // 2))
     screen.blit(text, text_rect)
 
