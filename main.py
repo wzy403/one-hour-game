@@ -33,6 +33,20 @@ youqing_tanmu = tanmu_msg["youqing_tanmu"]
 clock = pygame.time.Clock()
 FPS = 60
 
+# 初始心态值和最大心态值
+max_heart_rate = 100  # 最大心态值
+current_heart_rate = max_heart_rate  # 当前心态值
+
+# 心态条位置和尺寸
+heart_bar_width = 200  # 心态条的总宽度
+heart_bar_height = 20  # 心态条高度
+heart_bar_x = SCREEN_WIDTH - heart_bar_width - 20  # 靠右上角显示
+heart_bar_y = 20  # 距离顶部的距离
+
+# 心态条颜色
+heart_bar_color = (0, 255, 0)  # 绿色
+heart_bar_bg_color = (200, 200, 200)  # 背景灰色
+
 # Bomb button
 button_bomb_position = (200, 530)
 try:
@@ -192,13 +206,33 @@ while running:
                     gj_tanmu_list.remove(gj_tanmu)  # 删除空的弹幕
                     break
 
+    # 更新心态值
+    for tanmu in gj_tanmu_list:
+        if tanmu["x"] < 10:
+            if len(tanmu["text"]) > 1:
+                tanmu["text"] = tanmu["text"][1:]
+                current_heart_rate -= 1
+            else:
+                gj_tanmu_list.remove(tanmu)
+
     # 绘制图像
     screen.fill(WHITE)  # 背景填充为白色
 
+    # 绘制心态条背景
+    pygame.draw.rect(screen, heart_bar_bg_color, (heart_bar_x, heart_bar_y, heart_bar_width, heart_bar_height))
+
+    # 根据当前心态值绘制心态条
+    current_bar_width = int(heart_bar_width * (current_heart_rate / max_heart_rate))
+    pygame.draw.rect(screen, heart_bar_color, (heart_bar_x, heart_bar_y, current_bar_width, heart_bar_height))
+
+    # 在屏幕上显示心态条数值（可选）
+    text_surface = font.render(f"心态: {current_heart_rate}/{max_heart_rate}", True, BLACK)
+    screen.blit(text_surface, (heart_bar_x + heart_bar_width // 2 - text_surface.get_width() // 2, heart_bar_y - 25))
+
+
     # 绘制炸弹按钮
     screen.blit(bomb_image, button_bomb_rect)
-    font_bomb = pygame.font.SysFont("SimHei", 18)
-    text = font_bomb.render("那咋了？[E]", True, BLACK)
+    text = font.render("那咋了？[E]", True, BLACK)
     screen.blit(text, (button_bomb_rect.x - 20, button_bomb_rect.y + 70))
 
     #Draw a preview of dropping a bomb
