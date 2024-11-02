@@ -1,6 +1,7 @@
 import random
 import pygame
 import sys
+import math
 import json
 
 # 初始化 Pygame
@@ -60,6 +61,7 @@ pos_tanmu_list = []  # 发射的弹幕列表
 pos_tanmu_speed = 1  # 发射后弹幕的速度
 
 # 生成炸弹
+bomb_set_cd = 0
 creating_bomb = False
 def creating_bomb_draw():
     creating_bomb_pos = pygame.mouse.get_pos()
@@ -71,9 +73,18 @@ setted_bombs = []
 def create_a_bomb():
     new_bomb = {"position": pygame.mouse.get_pos(), "scale": 70, "img": bomb_image}
     setted_bombs.append(new_bomb)
+    global bomb_set_cd
+    bomb_set_cd = 600
 bomb_scale_increasing_speed = 1
 
+naZaLe = []
+def explosion(pos: tuple[int]):
+    for i in range(0, 24):
+        naZaLe.append({"text": "  那  咋  了", "time": 0, "position": pos, "id": i})
+
+
 font = pygame.font.Font("NotoSansSC-VariableFont_wght.ttf", 20)
+font_nazale = pygame.font.Font("NotoSansSC-VariableFont_wght.ttf", 20)
 
 # 定义按钮的位置和尺寸
 button_x = SCREEN_WIDTH - 150
@@ -99,7 +110,7 @@ while running:
             running = False
         elif event.type == pygame.MOUSEBUTTONDOWN:
             if button_bomb_rect.collidepoint(event.pos): #Want to set a bomb by clicking
-                if not creating_bomb:
+                if (not creating_bomb) and bomb_set_cd == 0:
                     creating_bomb = True
                 else:
                     creating_bomb = False
@@ -119,7 +130,7 @@ while running:
                 shot_tanmu_timer = 0
                 shot_tanmu = True
             elif event.key == pygame.K_e: #Want to set a bomb by pressing E
-                if not creating_bomb:
+                if (not creating_bomb) and bomb_set_cd == 0:
                     creating_bomb = True
                 else:
                     creating_bomb = False
@@ -129,9 +140,9 @@ while running:
     keys = pygame.key.get_pressed()
     
     # 根据上下键调整长方形的 y 坐标
-    if keys[pygame.K_UP]:
+    if keys[pygame.K_w]:
         rect_y -= rect_speed
-    if keys[pygame.K_DOWN]:
+    if keys[pygame.K_s]:
         rect_y += rect_speed
 
     # 更新游戏逻辑：生成随机弹幕
@@ -190,20 +201,48 @@ while running:
     font_bomb = pygame.font.SysFont("SimHei", 18)
     text = font_bomb.render("那咋了？[E]", True, BLACK)
     screen.blit(text, (button_bomb_rect.x - 20, button_bomb_rect.y + 70))
+    if bomb_set_cd != 0:
+        text_cd = font_bomb.render("冷却中……", True, BLACK)
+        screen.blit(text_cd, (button_bomb_rect.x - 20, button_bomb_rect.y + 90))
+
 
     #Draw a preview of dropping a bomb
-    if creating_bomb:
+    if creating_bomb and bomb_set_cd == 0:
         creating_bomb_draw()
+    
+    if bomb_set_cd != 0:
+        bomb_set_cd -= 1
 
     #Draw the setted bumb
     for bomb in setted_bombs:
         bomb_rect = bomb["img"].get_rect(center = bomb["position"])
         screen.blit(bomb["img"], bomb_rect)
         bomb["scale"] += bomb_scale_increasing_speed
-
         bomb["img"] = pygame.transform.scale(bomb_image, (bomb["scale"], bomb["scale"]))
         if bomb["scale"] == 120:
             setted_bombs.remove(bomb)
+            explosion(bomb["position"])
+    
+    #dispaly na za le
+    for nazaleItem in naZaLe:
+        nazaleItem["time"] += 1
+        if nazaleItem["time"] < nazaleItem["id"]:
+            continue
+        text_nazale = font.render(nazaleItem["text"], True, RED)
+        angle_nazale = nazaleItem["id"] * 15
+        text_nazale = pygame.transform.rotate(text_nazale, - angle_nazale)
+        radian_nazale = math.radians(angle_nazale)
+        x_nazale = nazaleItem["position"][0] + 100 * math.cos(radian_nazale)
+        y_nazale = nazaleItem["position"][1] + 100 * math.sin(radian_nazale)
+        rec_nazale = text_nazale.get_rect(center = (x_nazale, y_nazale))
+        screen.blit(text_nazale, rec_nazale)
+        if nazaleItem["time"] == 120 + nazaleItem["id"]:
+            naZaLe.remove(nazaleItem)
+        for gj_tanmu in gj_tanmu_list[:]:  # 遍历杠精弹幕
+            gj_rect = pygame.Rect(gj_tanmu["x"], gj_tanmu["y"], font.size(gj_tanmu["text"])[0], font.get_height())
+            if rec_nazale.colliderect(gj_rect):
+                gj_tanmu_list.remove(gj_tanmu)
+
 
 
     # 绘制按钮
